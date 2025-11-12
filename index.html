@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="./Estilo/style.css">
+    <!-- JS -->
+    <script defer src="./JS/main.js"></script>
+
+</head>
+
+<body>
+    <!-- Formulario para agregar tareas -->
+    <h1> Planificador de tareas</h1>
+
+
+    <form id="formulario" autocomplete="off">
+        <input id="titulo" placeholder="Escribe tu tarea...">
+        <button type="submit">Agregar</button>
+    </form>
+
+<p id="mensaje"></p>
+
+    <!-- Filtros -->
+    <div class="filtros">
+        <input id="buscar" placeholder="Buscar...">
+        <select id="estado">
+            <option value="todas">Todas</option>
+            <option value="pendientes">Pendientes</option>
+            <option value="hechas">Hechas</option>
+
+        </select>
+    </div>
+
+
+    <ul id="lista"></ul>
+
+</body>
+
+</html>

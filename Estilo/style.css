@@ -1,0 +1,73 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 16px;
+    background: #0b1220;
+    color: #e8eefc;
+}
+
+h1 {
+    display: flex;
+    margin: 0 0 12;
+    font-size: 50px;
+    justify-content: center;
+    align-items: center;
+}
+
+form,
+.filtros {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+input,
+select,
+button {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #273b66;
+    background: #0e1730;
+    color: #e8eefc;
+
+}
+
+button {
+    cursor: pointer;
+}
+
+#lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#lista li {
+    display: grid;
+    grid-template-columns: 24px 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dashed #1e2d52;
+}
+
+
+.tarea-hecha {
+    text-decoration: line-through;
+    color: #9bb0da;
+}
+
+#mensaje{
+    font-size:  13px;
+    margin: 4px 0 10px;
+    color: #ffb4b4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
