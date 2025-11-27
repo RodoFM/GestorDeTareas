@@ -1,4 +1,3 @@
-document.addEventListener("DOMContentLoaded", function () {
     function Tarea(id, titulo, realizada) {
         this.id = id
         this.titulo = titulo
@@ -162,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
     render();
 
 
-})
+
 
 
 
