@@ -1,174 +1,170 @@
-    function Tarea(id, titulo, realizada) {
-        this.id = id
-        this.titulo = titulo
-        this.realizada = realizada || false;
-    }
+let tareas = [];
+let CLAVE_LS_TAREAS = "";
 
+// CArgar las tareas que vienen desde datos.js
+document.addEventListener("tareas-cargadas", function (e) {
+    // Nos aseguramos de que cada elemento sea un objeto Tarea
+    tareas = e.detail.tareas;
+    CLAVE_LS_TAREAS = e.detail.clave;
+    render();
+});
 
-      //vinculacion con DOM
-    const formulario = document.getElementById("formulario");
-    const tituloInput = document.getElementById("titulo");
-    const buscar = document.getElementById("buscar");
-    const estado = document.getElementById("estado");
-    const lista = document.getElementById("lista");
-    const mensaje = document.getElementById("mensaje");
+// CNOstructor de Tareas
+function Tarea(id, titulo, realizada) {
+    this.id = id;
+    this.titulo = titulo;
+    this.realizada = realizada || false;
+}
 
+// referencas al DOM
+const formulario = document.getElementById("formulario");
+const tituloInput = document.getElementById("titulo");
+const buscar = document.getElementById("buscar");
+const estado = document.getElementById("estado");
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
 
-    const Tareas_Guardadas = "TareasGuardadas"
+// Guardar en LocalStorage
+function guardar() {
+    if (!CLAVE_LS_TAREAS) return; // por seguridad
+    localStorage.setItem(CLAVE_LS_TAREAS, JSON.stringify(tareas));
+}
 
-    let tareas = JSON.parse(localStorage.getItem(Tareas_Guardadas))
-    if (!tareas) tareas = [];
+// Generar ID
+function AsignacionId() {
+    let id = Number(localStorage.getItem("ultimoId")) || 1000;
+    id++;
+    localStorage.setItem("ultimoId", id);
+    return id;
+}
 
+// VAriables de filtro
+let busqueda = "";
+let estadoDelFiltro = "todas";
 
+function mostrarMensaje(texto) {
+    mensaje.textContent = texto || "";
+}
 
-    //Generar ID
-    function AsignacionId() {
-        let id = Number(localStorage.getItem("ultimoId")) || 0;
-        id++;
-        localStorage.setItem("ultimoId", id);
-        return id;
-    }
+// Filtración
+function filtrarTareas(filtro) {
+    return filtro.filter(function (tarea) {
+        const tituloMinuscula = tarea.titulo.toLowerCase();
+        const coincideTexto =
+            busqueda === "" ||
+            tituloMinuscula.includes(busqueda);
 
+        const coincideEstado =
+            estadoDelFiltro === "todas" ||
+            (estadoDelFiltro === "pendientes" && !tarea.realizada) ||
+            (estadoDelFiltro === "hechas" && tarea.realizada);
 
-    //GuArdado en LocalStorage
-    function guardar() {
-        localStorage.setItem(Tareas_Guardadas, JSON.stringify(tareas));
-    }
+        return coincideTexto && coincideEstado;
+    });
+}
 
+// Renderizar lista
+function render() {
+    const ver = filtrarTareas(tareas);
+    lista.innerHTML = "";
 
-    let busqueda = "";
-    let estadoDelFiltro = "todas";
+    ver.forEach(function (tarea) {
+        const li = document.createElement("li");
 
+        // Checkbox
+        const verificador = document.createElement("input");
+        verificador.type = "checkbox";
+        verificador.checked = tarea.realizada;
 
-    function mostrarMensaje(texto) {
-        mensaje.textContent = texto || "";
-    }
-
-
-
- //filtracion
-    function filtrarTareas(filtro) {
-        return filtro.filter(function (tarea) {
-            const coincideTexto = busqueda === "" || tarea.titulo.toLowerCase().includes(busqueda);
-            const coincideEstado = estadoDelFiltro === "todas" || (estadoDelFiltro === "pendientes" && !tarea.realizada) || (estadoDelFiltro === "hechas" && tarea.realizada);
-
-            return coincideTexto && coincideEstado;
+        verificador.addEventListener("change", function () {
+            const encontrada = tareas.find(t => t.id === tarea.id);
+            if (encontrada) {
+                encontrada.realizada = verificador.checked;
+                guardar();
+                render();
+            }
         });
-    }
 
+        // Texto
+        const contenedorSpan = document.createElement("contenedorSpan");
+        contenedorSpan.textContent = tarea.titulo;
+        if (tarea.realizada) contenedorSpan.classList.add("tarea-hecha");
 
-    //Visualizacion de tareas
-    function render() {
-        const ver = filtrarTareas(tareas);
-        lista.innerHTML = "";
+        // Botón eliminar
+        const botonEliminar = document.createElement("button");
+        botonEliminar.textContent = "Eliminar";
 
-        ver.forEach(function (tarea) {
-            const li = document.createElement("li");
+        botonEliminar.addEventListener("click", function () {
 
-            //Marcar si tarea esta realizada o pendiente
+            Swal.fire({
+                title: "¿Eliminar tarea?",
+                text: `La tarea "${tarea.titulo}" será eliminada.`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6"
+            }).then((resultado) => {
 
-            const verificador = document.createElement("input");
-            verificador.type = "checkbox";
-            verificador.checked = tarea.realizada;
-            verificador.addEventListener("change", function () {
-                const encontrada = tareas.find(function (t) {
-                    return t.id === tarea.id;
-                });
-                if (encontrada) {
-                    encontrada.realizada = verificador.checked;
+                if (resultado.isConfirmed) {
+                    // Eliminar la tarea
+                    tareas = tareas.filter(t => t.id !== tarea.id);
                     guardar();
                     render();
+
+                    Swal.fire({
+                        title: "Eliminada",
+                        text: "La tarea fue eliminada con éxito.",
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                 }
 
             });
 
-
-            const span = document.createElement("span");
-            span.textContent = tarea.titulo;
-            if (tarea.realizada) {
-                span.classList.add("tarea-hecha");
-            }
-
-            //creacion de boton para eliminar una tarea
-            const botonEliminar = document.createElement("button");
-            botonEliminar.textContent = "Eliminar";
-            botonEliminar.addEventListener("click", function () {
-                tareas = tareas.filter(function (t) {
-                    return t.id !== tarea.id;
-                });
-                guardar();
-                mostrarMensaje("Tarea Eliminada")
-                render();
-            });
-
-
-            //Ver si ya hay una tarea realizada
-            li.append(verificador, span, botonEliminar);
-            lista.appendChild(li);
         });
 
+        li.append(verificador, contenedorSpan, botonEliminar);
+        lista.appendChild(li);
+    });
+}
 
+// Agregar nuevas tareas
+formulario.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const texto = tituloInput.value.trim();
 
-        const yaHecha = tareas.some(function (t) {
-            return t.realizada;
-        });
+    if (!texto) {
+        mostrarMensaje("Escribe una tarea primero");
+        return;
     }
 
+    if (tareas.find(t => t.titulo === texto)) {
+        mostrarMensaje("Ya existe esa tarea");
+        return;
+    }
 
-   
+    const nueva = new Tarea(AsignacionId(), texto, false);
+    tareas.push(nueva);
 
-
-      //Agregaar nuevas tareas
-    formulario.addEventListener("submit", function (agregar) {
-        agregar.preventDefault();
-        const textoTitulo = tituloInput.value.trim();
-        if (!textoTitulo) {
-            mostrarMensaje("Escribe una tarea primero")
-            return;
-        }
-
-        const existe = tareas.find(function (t) {
-            return t.titulo === textoTitulo;
-        });
-        if (existe) {
-            mostrarMensaje("Ya existe esa tarea");
-            return;
-        }
-
-        //crear y giarda nueva tarea
-        const nueva = new Tarea(AsignacionId(), textoTitulo, false);
-        tareas.push(nueva);
-        guardar();
-        formulario.reset();
-        mostrarMensaje("Tarea Agregada")
-        render();
-
-    });
-
-    //buscar por texto
-    buscar.addEventListener("input", function (b) {
-        busqueda = b.target.value.trim().toLowerCase();
-        render();
-        mostrarMensaje("");
-    });
-
-    estado.addEventListener("change", function (e) {
-        estadoDelFiltro = e.target.value;
-        render();
-        mostrarMensaje("");
-    })
-
+    guardar();
+    formulario.reset();
+    mostrarMensaje("Tarea Agregada");
     render();
+});
 
+// Buscar texto
+buscar.addEventListener("input", function (e) {
+    busqueda = e.target.value.trim().toLowerCase();
+    render();
+    mostrarMensaje("");
+});
 
-
-
-
-
-
-
-
-
-
-
-
+// CAmbiar filtro de estado
+estado.addEventListener("change", function (e) {
+    estadoDelFiltro = e.target.value;
+    render();
+    mostrarMensaje("");
+});

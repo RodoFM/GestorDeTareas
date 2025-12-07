@@ -1,0 +1,5 @@
+[
+  { "id": 1, "titulo": "Preparar presentación del lunes", "realizada": false },
+  { "id": 2, "titulo": "Comprar materiales para el proyecto", "realizada": true },
+  { "id": 3, "titulo": "Leer documentación de JavaScript", "realizada": false }
+]
