@@ -1,6 +1,6 @@
 // JS/datos.js
 
-const RUTA_JSON = "../data/tareas.json";
+const RUTA_JSON = "./data/tareas.json";
 const CLAVE_LS = "TareasGuardadas";
 
 async function cargarTareasIniciales() {
